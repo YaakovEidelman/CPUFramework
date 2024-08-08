@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Text;
 
 namespace CPUFramework
 {
@@ -23,14 +24,22 @@ namespace CPUFramework
 
         public static DataTable GetDataTable(SqlCommand cmd)
         {
-            Debug.Print("-----" + Environment.NewLine + cmd.CommandText);
             DataTable dt = new();
             using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 cmd.Connection = conn;
-                SqlDataReader dr = cmd.ExecuteReader();
-                dt.Load(dr);
+                Debug.Print(GetSql(cmd));
+                try
+                {
+                    SqlDataReader dr = cmd.ExecuteReader();
+                    dt.Load(dr);
+                }
+                catch (SqlException ex)
+                {
+                    string msg = ParseConstraintMsg(ex.Message);
+                    throw new Exception(msg);
+                }
             }
             SetAllColumnsAllowNull(dt);
             return dt;
@@ -41,9 +50,55 @@ namespace CPUFramework
             return GetDataTable(new SqlCommand(sqlstatement));
         }
 
+        public static void ExecuteSQL(SqlCommand cmd)
+        {
+            GetDataTable(cmd);
+        }
+
         public static void ExecuteSQL(string sql)
         {
             GetDataTable(sql);
+        }
+
+        private static string ParseConstraintMsg(string msg)
+        {
+            string origmsg = msg;
+            string prefix = "ck_";
+            string msgend = "";
+            if(msg.Contains(prefix) == false)
+            {
+                if(msg.Contains("u_"))
+                {
+                    prefix = "u_";
+                    msgend = " must be unique";
+                }
+                else if (msg.Contains("f_"))
+                {
+                    prefix = "f_";
+                }
+                else if (msg.Contains("c_"))
+                {
+                    prefix = "c_";
+                }
+            }
+            if (msg.Contains(prefix))
+            {
+                msg = msg.Replace("\"", "'");
+                int pos = msg.IndexOf(prefix) + prefix.Length;
+                msg = msg.Substring(pos);
+                pos = msg.IndexOf("'");
+                if (pos == -1)
+                {
+                    msg = origmsg;
+                }
+                else
+                {
+                    msg = msg.Substring(0, pos);
+                    msg = msg.Replace("_", " ");
+                    msg += msgend;
+                }
+            }
+            return msg;
         }
 
         public static int GetFirstColumnFirstRowValue(string sql)
@@ -68,6 +123,48 @@ namespace CPUFramework
             {
                 c.AllowDBNull = true;
             }
+        }
+
+        public static string GetSql(SqlCommand cmd)
+        {
+            string val = "";
+#if DEBUG
+            StringBuilder sb = new StringBuilder();
+
+            if (cmd.Connection != null)
+            {
+                sb.AppendLine($"-- {cmd.Connection.DataSource}");
+                sb.AppendLine($"use {cmd.Connection.Database}");
+                sb.AppendLine("go");
+            }
+
+            if (cmd.CommandType == CommandType.StoredProcedure)
+            {
+                sb.AppendLine($"exec {cmd.CommandText}");
+                int paramcount = cmd.Parameters.Count - 1;
+                int paramnum = 0;
+                string comma = ",";
+                foreach (SqlParameter p in cmd.Parameters)
+                {
+                    if (p.Direction != ParameterDirection.ReturnValue)
+                    {
+                        if (paramcount == paramnum)
+                        {
+                            comma = "";
+                        }
+                        sb.AppendLine($"{p.ParameterName} = {(p.Value == null ? "null" : p.Value.ToString())}{comma}");
+                    }
+                    paramnum++;
+                }
+            }
+            else
+            {
+                sb.AppendLine(cmd.CommandText);
+            }
+
+            val = sb.ToString();
+#endif
+            return val;
         }
 
         public static void DebugPrintDataTable(DataTable dt)
