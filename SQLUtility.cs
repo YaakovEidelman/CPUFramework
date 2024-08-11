@@ -100,6 +100,10 @@ namespace CPUFramework
                 {
                     prefix = "fk_";
                 }
+                else if (msg.Contains("f_"))
+                {
+                    prefix = "f_";
+                }
                 else if (msg.Contains("c_"))
                 {
                     prefix = "c_";
@@ -121,7 +125,7 @@ namespace CPUFramework
                     msg = msg.Replace("_", " ");
                     msg += msgend;
 
-                    if(prefix == "fk_")
+                    if(prefix == "fk_" || prefix == "f_")
                     {
                         var words = msg.Split(" ");
                         if (words.Length > 1)
