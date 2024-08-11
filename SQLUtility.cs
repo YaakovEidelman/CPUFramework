@@ -38,6 +38,7 @@ namespace CPUFramework
                 try
                 {
                     SqlDataReader dr = cmd.ExecuteReader();
+                    CheckReturnValue(cmd);
                     if (loadtable)
                     {
                         dt.Load(dr);
@@ -55,6 +56,11 @@ namespace CPUFramework
             }
             SetAllColumnsAllowNull(dt);
             return dt;
+        }
+
+        private static void CheckReturnValue(SqlCommand cmd)
+        {
+            
         }
 
         public static DataTable GetDataTable(string sqlstatement)
