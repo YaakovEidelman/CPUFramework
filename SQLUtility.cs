@@ -27,6 +27,11 @@ namespace CPUFramework
             return DoExecuteSQL(cmd, true);
         }
 
+        public static void SaveDataRow(DataRow row, string sprocname)
+        {
+
+        }
+
         private static DataTable DoExecuteSQL(SqlCommand cmd, bool loadtable)
         {
             DataTable dt = new();
