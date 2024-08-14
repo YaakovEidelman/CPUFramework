@@ -29,7 +29,16 @@ namespace CPUFramework
 
         public static void SaveDataRow(DataRow row, string sprocname)
         {
-
+            SqlCommand cmd = GetSqlCommand(sprocname);
+            foreach (DataColumn c in row.Table.Columns)
+            {
+                string paramname = $"@{c.ColumnName}";
+                if (cmd.Parameters.Contains(paramname))
+                {
+                    SetParamValue(cmd, paramname, row[c.ColumnName]);
+                }
+            }
+            DoExecuteSQL(cmd, false);
         }
 
         private static DataTable DoExecuteSQL(SqlCommand cmd, bool loadtable)
