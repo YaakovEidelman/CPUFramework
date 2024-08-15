@@ -39,6 +39,18 @@ namespace CPUFramework
                 }
             }
             DoExecuteSQL(cmd, false);
+
+            foreach(SqlParameter p in cmd.Parameters)
+            {
+                if(p.Direction == ParameterDirection.InputOutput)
+                {
+                    string colname = p.ParameterName.Substring(1);
+                    if(row.Table.Columns.Contains(colname))
+                    {
+                        row[colname] = p.Value;
+                    }
+                }
+            }
         }
 
         private static DataTable DoExecuteSQL(SqlCommand cmd, bool loadtable)
