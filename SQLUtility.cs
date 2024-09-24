@@ -177,13 +177,13 @@ namespace CPUFramework
                 {
                     prefix = "fk_";
                 }
-                else if (msg.Contains("f_"))
-                {
-                    prefix = "f_";
-                }
                 else if (msg.Contains("c_"))
                 {
                     prefix = "c_";
+                }
+                else if (msg.Contains("f_"))
+                {
+                    prefix = "f_";
                 }
                 else if(msg.Contains(notnullprefix))
                 {
@@ -212,7 +212,8 @@ namespace CPUFramework
                         var words = msg.Split(" ");
                         if (words.Length > 1)
                         {
-                            msg = $"Cannot delete {words[1]} because it has a related {words[0]} record.";
+                            //msg = $"Cannot delete {words[1]} because it has a related {words[0]} record.";
+                            msg = "There is an issue involving a foreign key constraint";
                         }
                     }
                 }
