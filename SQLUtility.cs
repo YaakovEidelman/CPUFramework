@@ -171,7 +171,10 @@ namespace CPUFramework
                 if (msg.Contains("u_"))
                 {
                     prefix = "u_";
-                    msgend = " must be unique";
+                    if (msg.Contains("Must_Be_Unique") == false)
+                    {
+                        msgend = " Must Be Unique";
+                    }
                 }
                 else if (msg.Contains("fk_"))
                 {
