@@ -49,6 +49,13 @@ namespace CPUFramework
             return dt;
         }
 
+        public void Delete(int id)
+        {
+            SqlCommand cmd = SQLUtility.GetSqlCommand(_deletesproc);
+            SQLUtility.SetParamValue(cmd, _primarykeyparamname, id);
+            SQLUtility.ExecuteSQL(cmd);
+        }
+
         private void LoadProps(DataRow dr)
         {
             foreach (DataColumn col in dr.Table.Columns)
@@ -56,12 +63,22 @@ namespace CPUFramework
                 SetProp(col.ColumnName, dr[col.ColumnName]);
             }
         }
+        public void Delete()
+        {
+            PropertyInfo? prop = GetProp(_primarykeyname, true, false);
+            if (prop != null)
+            {
+                object? id = (int?)prop.GetValue(this);
+                if (id != null)
+                {
+                    this.Delete((int)id);
+                }
+            }
+        }
         public void Delete(DataTable datatable)
         {
             int id = (int)datatable.Rows[0][_primarykeyname];
-            SqlCommand cmd = SQLUtility.GetSqlCommand(_deletesproc);
-            SQLUtility.SetParamValue(cmd, _primarykeyparamname, id);
-            SQLUtility.ExecuteSQL(cmd);
+            this.Delete(id);
         }
 
         public void Save()
