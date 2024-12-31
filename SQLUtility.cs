@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+//using Microsoft.Data.SqlClient;
 
 namespace CPUFramework
 {
@@ -29,7 +30,7 @@ namespace CPUFramework
                 }
             }
         }
-
+        
         public static SqlCommand GetSqlCommand(string sprocname)
         {
             SqlCommand cmd;
