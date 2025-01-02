@@ -1,6 +1,6 @@
-﻿//using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Data.SqlClient;
+//using System.Data.SqlClient;
 using System.Reflection;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;

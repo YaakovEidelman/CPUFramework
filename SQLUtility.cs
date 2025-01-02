@@ -1,9 +1,9 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
+//using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-//using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace CPUFramework
 {
@@ -20,6 +20,7 @@ namespace CPUFramework
                 b.ConnectionString = ConnectionString;
                 b.UserID = userid;
                 b.Password = password;
+                b.TrustServerCertificate = true;
                 ConnectionString = b.ConnectionString;
             }
             if(tryopen)
