@@ -1,7 +1,5 @@
 ﻿using System.Data;
-//using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Microsoft.Data.SqlClient;
 
@@ -14,16 +12,19 @@ namespace CPUFramework
         public static void SetConnectionString(string connstring, bool tryopen, string userid = "", string password = "")
         {
             ConnectionString = connstring;
-            if(userid != "")
+            if (userid != "")
             {
                 SqlConnectionStringBuilder b = new();
                 b.ConnectionString = ConnectionString;
-                b.UserID = userid;
-                b.Password = password;
+                if (userid != "" && password != "")
+                {
+                    b.UserID = userid;
+                    b.Password = password;
+                }
                 b.TrustServerCertificate = true;
                 ConnectionString = b.ConnectionString;
             }
-            if(tryopen)
+            if (tryopen)
             {
                 using (SqlConnection conn = new(ConnectionString))
                 {
@@ -31,7 +32,7 @@ namespace CPUFramework
                 }
             }
         }
-        
+
         public static SqlCommand GetSqlCommand(string sprocname)
         {
             SqlCommand cmd;
@@ -53,7 +54,7 @@ namespace CPUFramework
         public static void SaveDataTable(DataTable dt, string sprocname)
         {
             Array rows = dt.Select("", "", DataViewRowState.Added | DataViewRowState.ModifiedCurrent);
-            foreach(DataRow r in rows)
+            foreach (DataRow r in rows)
             {
                 SaveDataRow(r, sprocname, false);
             }
@@ -73,12 +74,12 @@ namespace CPUFramework
             }
             DoExecuteSQL(cmd, false);
 
-            foreach(SqlParameter p in cmd.Parameters)
+            foreach (SqlParameter p in cmd.Parameters)
             {
-                if(p.Direction == ParameterDirection.InputOutput)
+                if (p.Direction == ParameterDirection.InputOutput)
                 {
                     string colname = p.ParameterName.Substring(1);
-                    if(row.Table.Columns.Contains(colname))
+                    if (row.Table.Columns.Contains(colname))
                     {
                         row[colname] = p.Value;
                     }
@@ -173,7 +174,7 @@ namespace CPUFramework
 
         public static void SetParamValue(SqlCommand cmd, string paramname, object value)
         {
-            if(!paramname.StartsWith("@"))
+            if (!paramname.StartsWith("@"))
             {
                 paramname = "@" + paramname;
             }
@@ -192,7 +193,7 @@ namespace CPUFramework
             string origmsg = msg;
             string prefix = "ck_";
             string msgend = "";
-            string notnullprefix = "Cannot insert the value NUll into column '"; 
+            string notnullprefix = "Cannot insert the value NUll into column '";
             if (msg.Contains(prefix) == false)
             {
                 if (msg.Contains("u_"))
@@ -215,7 +216,7 @@ namespace CPUFramework
                 {
                     prefix = "f_";
                 }
-                else if(msg.Contains(notnullprefix))
+                else if (msg.Contains(notnullprefix))
                 {
                     prefix = notnullprefix;
                     msgend = " cannot be blank.";
@@ -279,7 +280,7 @@ namespace CPUFramework
         public static int GetValueFromFristRowAsInt(DataTable dt, string columnname)
         {
             int value = 0;
-            if(dt.Rows.Count > 0)
+            if (dt.Rows.Count > 0)
             {
                 DataRow r = dt.Rows[0];
                 if (r[columnname] != null && r[columnname] is int)
@@ -307,7 +308,7 @@ namespace CPUFramework
         public static bool TableHasChanges(DataTable dt)
         {
             bool b = false;
-            if(dt.GetChanges() != null)
+            if (dt.GetChanges() != null)
             {
                 b = true;
             }
