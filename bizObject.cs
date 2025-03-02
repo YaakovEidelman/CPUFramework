@@ -46,18 +46,23 @@ namespace CPUFramework
             return dt;
         }
 
-        public List<T> GetList(bool includeblank = false)
+        public List<T> GetList(bool includeblank = false, int isrecipeget = 0)
         {
             SqlCommand cmd = SQLUtility.GetSqlCommand(_getsproc);
 
             if (cmd.Parameters.Contains("@All"))
-                SQLUtility.SetParamValue(cmd, "@all", 1);
+                SQLUtility.SetParamValue(cmd, "@All", 1);
 
             //I added this if statement in case a sproc doesn't have '@IncludeBlank'
             if (cmd.Parameters.Contains("@IncludeBlank"))
                 SQLUtility.SetParamValue(cmd, "@IncludeBlank", includeblank);
             else if (cmd.Parameters.Contains("@InsertBlank"))
                 SQLUtility.SetParamValue(cmd, "@InsertBlank", includeblank);
+
+            if(cmd.Parameters.Contains("@IsRecipeGet"))
+            {
+                SQLUtility.SetParamValue(cmd, "@IsRecipeGet", isrecipeget);
+            }
 
             DataTable dt = SQLUtility.GetDataTable(cmd);
 
