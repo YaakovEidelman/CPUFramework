@@ -46,7 +46,7 @@ namespace CPUFramework
             return dt;
         }
 
-        public List<T> GetList(bool includeblank = false, int isrecipeget = 0)
+        public List<T> GetList(bool includeblank = false, int isrecipeget = 0, int? cuisineid = null)
         {
             SqlCommand cmd = SQLUtility.GetSqlCommand(_getsproc);
 
@@ -59,9 +59,21 @@ namespace CPUFramework
             else if (cmd.Parameters.Contains("@InsertBlank"))
                 SQLUtility.SetParamValue(cmd, "@InsertBlank", includeblank);
 
-            if(cmd.Parameters.Contains("@IsRecipeGet"))
+            if (cmd.Parameters.Contains("@IsRecipeGet"))
             {
                 SQLUtility.SetParamValue(cmd, "@IsRecipeGet", isrecipeget);
+            }
+
+            if (cmd.Parameters.Contains("@CuisineId"))
+            {
+                if (cuisineid is null)
+                {
+                    SQLUtility.SetParamValue(cmd, "@CuisineId", DBNull.Value);
+                }
+                else
+                {
+                    SQLUtility.SetParamValue(cmd, "@CuisineId", cuisineid);
+                }
             }
 
             DataTable dt = SQLUtility.GetDataTable(cmd);
